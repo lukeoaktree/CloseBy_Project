@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)  // <-- This was missing
 
-        // Set up the toolbar (Ensure you have the toolbar in your layout)
+        // Set up the toolbar
         val toolbar = binding.appBarMain.toolbar  // assuming toolbar is inside the layout with id `toolbar`
         setSupportActionBar(toolbar)  // Set the toolbar as the action bar
 
