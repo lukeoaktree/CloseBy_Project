@@ -20,6 +20,14 @@
         android:hint="Enter Password"
         android:inputType="textPassword" />
 
+    <!-- <EditText
+        android:id="@+id/confirmPasswordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Confirm Password"
+        android:inputType="textPassword"
+        android:importantForAccessibility="yes" /> -->
+
     <Button
         android:id="@+id/registerButton"
         android:layout_width="match_parent"

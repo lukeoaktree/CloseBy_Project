@@ -20,7 +20,7 @@
 
         <!-- Register the new activity here -->
         <activity android:name=".ui.NeighborhoodActivity"></activity>
-        <activity android:name=".ui.CreateNeighborhoodActivity"></activity>
+        <activity android:name=".CreateNeighborhoodActivity"></activity>
 
 
         <!-- Other activities (like RegisterActivity) go here -->
