@@ -18,9 +18,15 @@
         android:theme="@style/Theme.CloseBy"
         >
 
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false" />
+        <!-- Register the new activity here -->
+        <activity android:name=".ui.NeighborhoodActivity"></activity>
+        <activity android:name=".ui.CreateNeighborhoodActivity"></activity>
+
+
+        <!-- Other activities (like RegisterActivity) go here -->
+        <activity android:name=".RegisterActivity"></activity>
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

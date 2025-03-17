@@ -5,10 +5,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.closeby.ui.NeighborhoodActivity
 import org.json.JSONObject
 
 class RegisterActivity : AppCompatActivity() {
@@ -47,6 +49,10 @@ class RegisterActivity : AppCompatActivity() {
             Response.Listener { response ->
                 // Success - user registered successfully
                 Toast.makeText(this, "User registered successfully!", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, NeighborhoodActivity::class.java)
+
+                startActivity(intent)
+                finish()  // Close the RegisterActivity so that the user can't go back
             },
             Response.ErrorListener { error ->
                 // Error - failed to register
@@ -67,5 +73,6 @@ class RegisterActivity : AppCompatActivity() {
 
         // Add the request to the queue
         requestQueue.add(stringRequest)
+
     }
 }
