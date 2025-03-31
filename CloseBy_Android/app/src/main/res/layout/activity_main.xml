@@ -8,14 +8,14 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-    <!-- Include your toolbar layout here -->
+    <!-- toolbar layout -->
     <include
         android:id="@+id/app_bar_main"
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- The Navigation View with the drawer menu -->
+    <!-- navigation view -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
@@ -25,7 +25,6 @@
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
 
-    <!-- Fragment Container View for the navigation -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment_content_main"
         android:name="androidx.navigation.fragment.NavHostFragment"

@@ -4,11 +4,11 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 
-const app = express(); // Initialize the app
+const app = express(); // initialize the app
 app.use(cors());
 app.use(bodyParser.json());
 
-// REGISTER USER API
+// register user
 app.post("/api/register", async (req, res) => {
     console.log("User Registered"); 
     console.log(req.body); 
@@ -20,7 +20,7 @@ app.post("/api/register", async (req, res) => {
     }
 
     try {
-        // Hash password before storing it
+        // hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const query = 'INSERT INTO members (`email`, `password`) VALUES (?, ?)';
@@ -36,11 +36,12 @@ app.post("/api/register", async (req, res) => {
     }
 });
 
-// Neighborhood Creation API**
+// neighborhood creation 
 app.post("/createNeighborhood", async (req, res) => {
     
     console.log("Neighborhood Registered"); 
     console.log(req.body); 
+    
     const { name, latitude, longitude, user_id } = req.body;
 
     if (!name || !latitude || !longitude || !user_id) {
@@ -52,14 +53,14 @@ app.post("/createNeighborhood", async (req, res) => {
         let exists = true;
     
         while (exists) {
-            joinCode = Math.random().toString(36).substring(2, 8).toUpperCase(); // Generate random 6-character code
+            joinCode = Math.random().toString(36).substring(2, 8).toUpperCase(); // generate random 6 character code
     
-            // Check if the code already exists in the database
+            // check if the code already exists in the database
             const sql = "SELECT COUNT(*) AS count FROM neighborhoods WHERE join_code = ?";
             const [rows] = await db.promise().query(sql, [joinCode]);
     
             if (rows[0].count === 0) {
-                exists = false; // Exit loop if unique
+                exists = false; // proceed if its unique
             }
         }
     
@@ -67,7 +68,7 @@ app.post("/createNeighborhood", async (req, res) => {
     };
 
     const generateNeighborhoodId = () => {
-        return Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit unique ID
+        return Math.floor(100000 + Math.random() * 900000); // unique neighborhood id
     };
 
     try {
@@ -90,9 +91,7 @@ app.post("/createNeighborhood", async (req, res) => {
     }
 });
 
-
-
-// Start the server
+// start the server
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

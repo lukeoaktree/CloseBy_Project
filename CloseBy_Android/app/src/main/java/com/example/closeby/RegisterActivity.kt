@@ -27,9 +27,9 @@ class RegisterActivity : AppCompatActivity() {
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
 
-            // Check if fields are empty
+            // check if fields are empty
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                // Call the registerUser function to send the network request
+                // call registerUser
                 registerUser(email, password)
             } else {
                 Toast.makeText(this, "Please enter both email and password", Toast.LENGTH_SHORT).show()
@@ -39,31 +39,31 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun registerUser(email: String, password: String) {
         val jsonObject = JSONObject()
-        jsonObject.put("email", email)  // Only sending email and password
+        jsonObject.put("email", email)
         jsonObject.put("password", password)
 
         val requestQueue = Volley.newRequestQueue(this)
 
         val stringRequest = object : StringRequest(
-            Request.Method.POST, "http://10.0.2.2:3000/api/register",  // Use 10.0.2.2 for emulator
+            Request.Method.POST, "http://10.0.2.2:3000/api/register",
             Response.Listener { response ->
-                // Success - user registered successfully
+                // user registered successfully
                 Toast.makeText(this, "User registered successfully!", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, NeighborhoodActivity::class.java)
 
                 startActivity(intent)
-                finish()  // Close the RegisterActivity so that the user can't go back
+                finish()  // close the RegisterActivity so that the user can't go back
             },
             Response.ErrorListener { error ->
-                // Error - failed to register
+                // failed to register
                 Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
             }) {
 
             override fun getBody(): ByteArray {
-                return jsonObject.toString().toByteArray()  // Send the email and password in JSON format
+                return jsonObject.toString().toByteArray()  // send the email and password in JSON format
             }
 
-            // Set content type as application/json for the request
+            // set content type as application/json for the request
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
                 headers["Content-Type"] = "application/json"
@@ -71,7 +71,6 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        // Add the request to the queue
         requestQueue.add(stringRequest)
 
     }

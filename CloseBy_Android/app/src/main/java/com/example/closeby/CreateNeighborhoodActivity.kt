@@ -27,7 +27,7 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
     private lateinit var nameInput: EditText
     private lateinit var createButton: Button
 
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1  // Request code to identify permission request
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1  // location permission
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,13 +47,13 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Fetch current location and send the data to the backend
+            // send current location to the backend
             fetchLocationAndCreateNeighborhood(name)
         }
     }
 
     private fun fetchLocationAndCreateNeighborhood(name: String) {
-        // Check if location permissions are granted
+        // check location permissions
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -62,7 +62,7 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // Request permissions if not granted
+            // request permissions if not granted
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -71,15 +71,15 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
             return
         }
 
-        // Permissions are granted, proceed to fetch location
+        // permissions are granted
         fusedLocationClient.lastLocation
             .addOnSuccessListener(this, OnSuccessListener { location ->
                 if (location != null) {
                     val latitude = location.latitude
                     val longitude = location.longitude
-                    val userId = 1 // Replace with actual user ID
+                    val userId = 1
 
-                    // Send data to the server
+                    // send data to the server
                     createNeighborhood(name, latitude, longitude, userId)
                 } else {
                     Toast.makeText(this, "Unable to get location", Toast.LENGTH_SHORT).show()
@@ -88,7 +88,7 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
     }
 
     private fun createNeighborhood(name: String, latitude: Double, longitude: Double, userId: Int) {
-        val url = "http://10.0.2.2:3000/createNeighborhood"  // Update with actual backend IP
+        val url = "http://10.0.2.2:3000/createNeighborhood"
 
         val jsonObject = JSONObject()
         jsonObject.put("name", name)
@@ -98,13 +98,15 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
 
         val request = JsonObjectRequest(
             Request.Method.POST, url, jsonObject,
-            Response.Listener { response ->
+            // Response.ErrorListener is unnecessary here
+            { response ->
                 Toast.makeText(this, "Neighborhood Created!", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, NeighborhoodActivity::class.java) // Redirect to another screen
                 startActivity(intent)
                 finish()
             },
-            Response.ErrorListener { error ->
+           // Response.ErrorListener is unnecessary here
+            { error ->
                 Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         )
@@ -112,17 +114,17 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
         requestQueue.add(request)
     }
 
-    // This method is called when the user responds to the permission request
+    // user response to location request
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, fetch the location
+                // if permission granted
                 val name = nameInput.text.toString().trim()
                 fetchLocationAndCreateNeighborhood(name)
             } else {
-                // Permission denied, show a toast
+                // permission denied message
                 Toast.makeText(this, "Location permission is required", Toast.LENGTH_SHORT).show()
             }
         }

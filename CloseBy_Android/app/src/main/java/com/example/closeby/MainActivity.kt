@@ -22,32 +22,26 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize View Binding
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)  // <-- This was missing
+        setContentView(binding.root)
 
-        // Set up the toolbar
-        val toolbar = binding.appBarMain.toolbar  // assuming toolbar is inside the layout with id `toolbar`
-        setSupportActionBar(toolbar)  // Set the toolbar as the action bar
+        val toolbar = binding.appBarMain.toolbar
+        setSupportActionBar(toolbar)
 
-        // Initialize Navigation Drawer Components
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
-        // Configure top-level destinations for the navigation drawer
         appBarConfiguration = AppBarConfiguration(
             setOf(R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow),
             drawerLayout
         )
 
-        // Set up the action bar with the NavController
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        // Set up the navigation drawer with the NavController
         navView.setupWithNavController(navController)
 
-        // Find and set the click listener for the register button
+        // set the click listener for the register button
         val registerButton: Button = findViewById(R.id.registerButton)
         registerButton.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)

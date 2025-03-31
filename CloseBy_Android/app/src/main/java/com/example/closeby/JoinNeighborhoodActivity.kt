@@ -9,6 +9,5 @@ class JoinNeighborhoodActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_join_neighborhood)
 
-        // Add your logic for the "Join Neighborhood" screen
     }
 }
