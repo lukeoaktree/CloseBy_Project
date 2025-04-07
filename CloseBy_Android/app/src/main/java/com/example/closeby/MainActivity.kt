@@ -13,18 +13,36 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.closeby.databinding.ActivityMainBinding
+import com.example.closeby.ui.NeighborhoodActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize Firebase Authentication
+        auth = FirebaseAuth.getInstance()
+
+        // Check if the user is logged in
+        val user = auth.currentUser
+        if (user == null) {
+            // If no user is logged in, redirect to login screen
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()  // Close the current activity so the user can't come back to it
+            return
+        }
+
+        // Set up the main content view
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Set up the toolbar and drawer layout
         val toolbar = binding.appBarMain.toolbar
         setSupportActionBar(toolbar)
 
@@ -41,19 +59,7 @@ class MainActivity : AppCompatActivity() {
 
         navView.setupWithNavController(navController)
 
-        // set the click listener for the register button
-        val registerButton: Button = findViewById(R.id.registerButton)
-        registerButton.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
-        }
-        val btnLogin: Button = findViewById(R.id.btnLogin)
-        btnLogin.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-        }
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
