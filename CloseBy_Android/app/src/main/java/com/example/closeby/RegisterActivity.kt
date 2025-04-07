@@ -35,6 +35,13 @@ class RegisterActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please enter both email and password", Toast.LENGTH_SHORT).show()
             }
         }
+
+//        val btnLogin = findViewById<Button>(R.id.btnLogin)
+//        btnLogin.setOnClickListener {
+//            val intent = Intent(this, LoginActivity::class.java)
+//            startActivity(intent)
+//        }
+
     }
 
     private fun registerUser(email: String, password: String) {

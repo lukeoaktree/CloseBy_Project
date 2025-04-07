@@ -21,6 +21,8 @@
 
         <activity android:name=".ui.NeighborhoodActivity"></activity>
         <activity android:name=".CreateNeighborhoodActivity"></activity>
+        <activity android:name=".LoginActivity" />
+
 
         <activity android:name=".RegisterActivity"></activity>
 
