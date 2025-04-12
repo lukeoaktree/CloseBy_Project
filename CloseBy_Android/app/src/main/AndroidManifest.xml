@@ -22,8 +22,6 @@
         <activity android:name=".ui.NeighborhoodActivity"></activity>
         <activity android:name=".CreateNeighborhoodActivity"></activity>
         <activity android:name=".LoginActivity" />
-
-
         <activity android:name=".RegisterActivity"></activity>
 
         <activity
@@ -33,9 +31,8 @@
             android:theme="@style/Theme.CloseBy.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter>+
         </activity>
     </application>
 

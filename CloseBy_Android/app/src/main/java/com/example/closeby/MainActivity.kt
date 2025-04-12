@@ -25,41 +25,49 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize Firebase Authentication
         auth = FirebaseAuth.getInstance()
 
-        // Check if the user is logged in
         val user = auth.currentUser
+
         if (user == null) {
-            // If no user is logged in, redirect to login screen
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-            finish()  // Close the current activity so the user can't come back to it
-            return
+            // Show the login/register layout (app_bar_main.xml)
+            setContentView(R.layout.app_bar_main)
+
+            val loginButton: Button = findViewById(R.id.loginButton)
+            val registerButton: Button = findViewById(R.id.registerButton)
+
+            loginButton.setOnClickListener {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
+
+            registerButton.setOnClickListener {
+                val intent = Intent(this, RegisterActivity::class.java)
+                startActivity(intent)
+            }
+
+        } else {
+            // User is logged in, show the main UI (activity_main.xml)
+            binding = ActivityMainBinding.inflate(layoutInflater)
+            setContentView(binding.root)
+
+            val toolbar = binding.appBarMain.toolbar
+            setSupportActionBar(toolbar)
+
+            val drawerLayout: DrawerLayout = binding.drawerLayout
+            val navView: NavigationView = binding.navView
+            val navController = findNavController(R.id.nav_host_fragment_content_main)
+
+            appBarConfiguration = AppBarConfiguration(
+                setOf(R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow),
+                drawerLayout
+            )
+
+            setupActionBarWithNavController(navController, appBarConfiguration)
+            navView.setupWithNavController(navController)
         }
-
-        // Set up the main content view
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // Set up the toolbar and drawer layout
-        val toolbar = binding.appBarMain.toolbar
-        setSupportActionBar(toolbar)
-
-        val drawerLayout: DrawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-
-        appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow),
-            drawerLayout
-        )
-
-        setupActionBarWithNavController(navController, appBarConfiguration)
-
-        navView.setupWithNavController(navController)
-
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
