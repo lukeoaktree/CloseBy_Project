@@ -12,6 +12,8 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.closeby.ui.NeighborhoodActivity
 import org.json.JSONObject
+import com.google.firebase.auth.FirebaseAuth
+
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -32,7 +34,8 @@ class RegisterActivity : AppCompatActivity() {
                 // call registerUser
                 registerUser(email, password)
             } else {
-                Toast.makeText(this, "Please enter both email and password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter both email and password", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
@@ -45,32 +48,46 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun registerUser(email: String, password: String) {
+        val auth = FirebaseAuth.getInstance()
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Firebase registration success, now send the email to your backend
+                    sendEmailToServer(email)
+                } else {
+                    // Firebase registration failed
+                    Toast.makeText(
+                        this,
+                        "Firebase error: ${task.exception?.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+    }
+
+    private fun sendEmailToServer(email: String) {
         val jsonObject = JSONObject()
         jsonObject.put("email", email)
-        jsonObject.put("password", password)
 
         val requestQueue = Volley.newRequestQueue(this)
 
         val stringRequest = object : StringRequest(
             Request.Method.POST, "http://10.0.2.2:3000/api/register",
             Response.Listener { response ->
-                // user registered successfully
                 Toast.makeText(this, "User registered successfully!", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, NeighborhoodActivity::class.java)
-
                 startActivity(intent)
-                finish()  // close the RegisterActivity so that the user can't go back
+                finish()
             },
             Response.ErrorListener { error ->
-                // failed to register
-                Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
-            }) {
-
+                Toast.makeText(this, "Server error: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        ) {
             override fun getBody(): ByteArray {
-                return jsonObject.toString().toByteArray()  // send the email and password in JSON format
+                return jsonObject.toString().toByteArray()
             }
 
-            // set content type as application/json for the request
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
                 headers["Content-Type"] = "application/json"
@@ -79,6 +96,6 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         requestQueue.add(stringRequest)
-
     }
+
 }

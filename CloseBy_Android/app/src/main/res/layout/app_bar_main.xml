@@ -20,7 +20,7 @@
             app:popupTheme="@style/Theme.CloseBy.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <!-- <include layout="@layout/content_main" /> -->
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
@@ -36,7 +36,7 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/registerButton"
+        android:id="@+id/registerMainButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create an Account"
@@ -44,11 +44,11 @@
         android:layout_centerVertical="true" />
 
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/loginMainButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login"
-        android:layout_below="@id/registerButton"
+        android:layout_below="@id/registerMainButton"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp" />
 

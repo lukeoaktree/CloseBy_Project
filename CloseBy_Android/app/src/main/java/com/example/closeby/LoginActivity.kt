@@ -6,7 +6,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.closeby.ui.NeighborhoodActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 
 class LoginActivity : AppCompatActivity() {
 
@@ -38,19 +40,45 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
+                    // Proceed to the next activity
                     val user = auth.currentUser
                     if (user != null) {
-                        Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
 
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
+                        Toast.makeText(this, "Login successful! :D", Toast.LENGTH_SHORT).show()
+
+                        startActivity(Intent(this, NeighborhoodActivity::class.java))
                         finish()
                     }
                 } else {
-                    // login failed
-                    val errorMessage = task.exception?.message ?: "Authentication failed"
-                    Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+                    // Handle different error scenarios
+                    val errorCode = (task.exception as FirebaseAuthException).errorCode
+                    when (errorCode) {
+                        "ERROR_INVALID_EMAIL" -> {
+                            Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show()
+                        }
+
+                        "ERROR_WRONG_PASSWORD" -> {
+                            Toast.makeText(this, "Incorrect password", Toast.LENGTH_SHORT).show()
+                        }
+
+                        "ERROR_USER_NOT_FOUND" -> {
+                            Toast.makeText(
+                                this,
+                                "No user found with this email",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        else -> {
+                            Toast.makeText(
+                                this,
+                                "Login failed: ${task.exception?.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
                 }
             }
     }
 }
+

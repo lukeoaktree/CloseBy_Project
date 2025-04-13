@@ -2,39 +2,32 @@ const express = require("express");
 const db = require("./db");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt");
 
 const app = express(); // initialize the app
 app.use(cors());
 app.use(bodyParser.json());
 
-// register user
-app.post("/api/register", async (req, res) => {
-    console.log("User Registered"); 
-    console.log(req.body); 
+// register user (email only, password now handled by Firebase)
+app.post("/api/register", (req, res) => {
+    console.log("User Registered");
+    console.log(req.body);
 
-    const { email, password } = req.body;
+    const { email } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required." });
+    if (!email) {
+        return res.status(400).json({ error: "Email is required." });
     }
 
-    try {
-        // hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const query = 'INSERT INTO members (`email`, `password`) VALUES (?, ?)';
-        db.query(query, [email, hashedPassword], (err, result) => {
-            if (err) {
-                console.log("Database error:", err);
-                return res.status(500).json({ error: err.message });
-            }   
-            res.json({ message: "User registered successfully!" });
-        });
-    } catch (error) {
-        res.status(500).json({ error: "Error registering user" });
-    }
+    const query = 'INSERT INTO members (`email`) VALUES (?)';
+    db.query(query, [email], (err, result) => {
+        if (err) {
+            console.log("Database error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ message: "User registered successfully!" });
+    });
 });
+
 
 // neighborhood creation 
 app.post("/createNeighborhood", async (req, res) => {
