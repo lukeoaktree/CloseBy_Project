@@ -25,7 +25,8 @@ class NeighborhoodActivity : AppCompatActivity() {
         // check if buttons are being clicked
         joinButton.setOnClickListener {
             val intent = Intent(this, JoinNeighborhoodActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, JoinNeighborhoodActivity::class.java))
+
         }
 
         createButton.setOnClickListener {

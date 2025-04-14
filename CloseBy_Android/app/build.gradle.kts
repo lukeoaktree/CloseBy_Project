@@ -49,6 +49,8 @@ dependencies {
     implementation("com.google.firebase:firebase-core:21.1.0") // Core for Firebase
     implementation("com.google.firebase:firebase-analytics")
 
+    implementation ("androidx.recyclerview:recyclerview:1.2.1")
+
     implementation("com.android.volley:volley:1.2.1")
     implementation("com.google.android.gms:play-services-location:18.0.0")
     implementation(libs.androidx.core.ktx)

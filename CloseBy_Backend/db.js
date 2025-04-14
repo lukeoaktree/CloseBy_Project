@@ -1,6 +1,5 @@
-const mysql2 = require("mysql2");
-
-const connection = mysql2.createConnection({
+const mysql = require('mysql2');
+const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Marlins161",
@@ -12,4 +11,5 @@ connection.connect(err => {
     console.log("Connected to the database! Yippee!!");
 });
 
-module.exports = connection;  
+// Export the promise-based version
+module.exports = connection.promise();

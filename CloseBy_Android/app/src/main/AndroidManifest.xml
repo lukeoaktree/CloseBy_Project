@@ -23,6 +23,10 @@
         <activity android:name=".CreateNeighborhoodActivity"></activity>
         <activity android:name=".LoginActivity"></activity>
         <activity android:name=".RegisterActivity"></activity>
+        <activity android:name=".ui.JoinNeighborhoodActivity" />
+        <activity android:name=".NeighborhoodMainActivity"/>
+
+
 
         <activity
             android:name=".MainActivity"
