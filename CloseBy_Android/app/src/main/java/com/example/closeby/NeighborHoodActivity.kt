@@ -1,4 +1,4 @@
-package com.example.closeby.ui
+package com.example.closeby
 
 import android.content.Intent
 import android.os.Bundle

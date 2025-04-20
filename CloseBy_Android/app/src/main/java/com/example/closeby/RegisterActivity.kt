@@ -10,7 +10,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.example.closeby.ui.NeighborhoodActivity
+import com.example.closeby.NeighborhoodActivity
 import org.json.JSONObject
 import com.google.firebase.auth.FirebaseAuth
 
@@ -39,12 +39,32 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
+
 //        val btnLogin = findViewById<Button>(R.id.btnLogin)
 //        btnLogin.setOnClickListener {
 //            val intent = Intent(this, LoginActivity::class.java)
 //            startActivity(intent)
 //        }
 
+    }
+
+    private fun checkEmailExistence(email: String, password: String) {
+        FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val signInMethods = task.result?.signInMethods
+                    if (signInMethods.isNullOrEmpty()) {
+                        // Email is not in use, proceed with registration
+                        registerUser(email, password)
+                    } else {
+                        // Email is already in use, show an appropriate message
+                        Toast.makeText(this, "Email is already registered", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    // Handle error checking the email
+                    Toast.makeText(this, "Error checking email: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun registerUser(email: String, password: String) {
@@ -55,6 +75,9 @@ class RegisterActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Firebase registration success, now send the email to your backend
                     sendEmailToServer(email)
+                    Toast.makeText(this, "User registered successfully!", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, NeighborhoodActivity::class.java)
+                    startActivity(intent)
                 } else {
                     // Firebase registration failed
                     Toast.makeText(
@@ -97,5 +120,6 @@ class RegisterActivity : AppCompatActivity() {
 
         requestQueue.add(stringRequest)
     }
+
 
 }

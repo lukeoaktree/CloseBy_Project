@@ -1,4 +1,4 @@
-package com.example.closeby.ui
+package com.example.closeby
 
 import android.content.Intent
 import android.os.Bundle
@@ -36,7 +36,7 @@ class JoinNeighborhoodActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Get the current user's Firebase UID
+            // get current users firebase UID
             val user = FirebaseAuth.getInstance().currentUser
             if (user == null) {
                 Toast.makeText(this, "No user is logged in", Toast.LENGTH_SHORT).show()
@@ -53,10 +53,10 @@ class JoinNeighborhoodActivity : AppCompatActivity() {
 
             val request = JsonObjectRequest(
                 Request.Method.POST,
-                "http://10.0.2.2:3000/checkNeighborhoodCode", // Backend URL
+                "http://10.0.2.2:3000/checkNeighborhoodCode",
                 json,
                 { response ->
-                    Log.d("JoinNeighborhood", "API Response: $response")  // Log the full response
+                    Log.d("JoinNeighborhood", "API Response: $response")
 
                     // code found
                     val name = response.getString("name")
@@ -70,11 +70,12 @@ class JoinNeighborhoodActivity : AppCompatActivity() {
                     Log.d("Neighborhood", "Found: $name at $lat, $lng")
                     // You can pass this info to the next step
                     val intent = Intent(this, NeighborhoodMainActivity::class.java).apply {
+                        putExtra("neighborhoodId", code)
                         putExtra("neighborhoodName", name)
                         putExtra("latitude", lat)
                         putExtra("longitude", lng)
                     }
-                    startActivity(Intent(this, NeighborhoodMainActivity::class.java))
+                    startActivity(intent)
                 },
                 { error ->
                     Log.e("JoinNeighborhood", "Error occurred: ${error.message}", error)
@@ -89,10 +90,8 @@ class JoinNeighborhoodActivity : AppCompatActivity() {
                 }
             )
 
-            // Add the request to the queue
             Volley.newRequestQueue(this).add(request)
 
-            
         }
     }
 }

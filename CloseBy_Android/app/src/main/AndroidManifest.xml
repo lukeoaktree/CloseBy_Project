@@ -19,12 +19,15 @@
         android:theme="@style/Theme.CloseBy"
         >
 
-        <activity android:name=".ui.NeighborhoodActivity"></activity>
+        <activity android:name=".NeighborhoodActivity"></activity>
         <activity android:name=".CreateNeighborhoodActivity"></activity>
         <activity android:name=".LoginActivity"></activity>
         <activity android:name=".RegisterActivity"></activity>
-        <activity android:name=".ui.JoinNeighborhoodActivity" />
-        <activity android:name=".NeighborhoodMainActivity"/>
+        <activity android:name=".JoinNeighborhoodActivity" />
+        <activity
+            android:name=".NeighborhoodMainActivity"
+            android:windowSoftInputMode="adjustResize" />
+
 
 
 
