@@ -68,7 +68,7 @@ class JoinNeighborhoodActivity : AppCompatActivity() {
 
                     // location check
                     Log.d("Neighborhood", "Found: $name at $lat, $lng")
-                    // You can pass this info to the next step
+
                     val intent = Intent(this, NeighborhoodMainActivity::class.java).apply {
                         putExtra("neighborhoodId", code)
                         putExtra("neighborhoodName", name)
