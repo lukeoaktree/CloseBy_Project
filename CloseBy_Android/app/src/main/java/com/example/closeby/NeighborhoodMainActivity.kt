@@ -2,8 +2,12 @@ package com.example.closeby
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,8 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.closeby.MessageAdapter
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.ListenerRegistration
+
 
 class NeighborhoodMainActivity : AppCompatActivity() {
 
@@ -20,9 +28,10 @@ class NeighborhoodMainActivity : AppCompatActivity() {
     private lateinit var messageInput: EditText
     private lateinit var sendButton: Button
     private lateinit var messagesRecyclerView: RecyclerView
-
+    private lateinit var channelsRecyclerView: RecyclerView
+    private lateinit var channelsAdapter: ChannelAdapter
+    private var selectedChannelId: String? = null
     private lateinit var messagesAdapter: MessageAdapter  // Adapter for RecyclerView
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,8 +43,25 @@ class NeighborhoodMainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_neighborhood_main)
 
-        neighborhoodNameTextView = findViewById(R.id.neighborhoodName)
-        neighborhoodNameTextView.text = neighborhoodName
+        // Initialize the Spinner for selecting a channel
+        val spinner: Spinner = findViewById(R.id.channelSpinner)
+        val channelNames = listOf("Main", "General", "Tech", "Random")  // Use actual channel names
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, channelNames)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+
+        // Set up the Spinner onItemSelectedListener
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedChannel = channelNames[position]
+                // Call the function to load messages for the selected channel
+                loadMessagesForChannel(selectedChannel)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Do nothing if no selection is made
+            }
+        }
 
         neighborhoodNameTextView = findViewById(R.id.neighborhoodName)
         messageInput = findViewById(R.id.messageInput)
@@ -46,41 +72,67 @@ class NeighborhoodMainActivity : AppCompatActivity() {
         messagesAdapter = MessageAdapter(mutableListOf())
         messagesRecyclerView.adapter = messagesAdapter
 
-        // set name of neighborhood
         neighborhoodNameTextView.text = neighborhoodName
 
+        channelsRecyclerView = findViewById(R.id.channelsRecyclerView)
+        channelsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        loadChannels(neighborhoodId)
+
         sendButton.setOnClickListener {
-            val message = messageInput.text.toString().trim()
-            if (message.isNotEmpty()) {
-                sendMessage(neighborhoodId, message)
-                messageInput.text.clear()
+            val messageText = messageInput.text.toString().trim()
+            if (messageText.isNotEmpty()) {
+                if (selectedChannelId != null) {
+                    sendMessage(neighborhoodId, messageText)
+                    messageInput.text.clear()
+                } else {
+                    Toast.makeText(this, "No channel selected.", Toast.LENGTH_SHORT).show()
+                }
             } else {
                 Toast.makeText(this, "Message cannot be empty", Toast.LENGTH_SHORT).show()
             }
         }
-        listenForMessages(neighborhoodId)
 
     }
+
     fun sendMessage(neighborhoodId: String, messageText: String) {
         val db = FirebaseFirestore.getInstance()
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val channelId = selectedChannelId ?: return  // Make sure this is correctly set when the channel is selected
 
-        val message = Message(
-            senderId = currentUserId,
-            text = messageText,
-            timestamp = System.currentTimeMillis()
+        val message = hashMapOf(
+            "senderId" to currentUserId,
+            "text" to messageText,
+            "timestamp" to FieldValue.serverTimestamp()
         )
 
+        // Ensure that you are targeting the correct Firestore path for the channel
         db.collection("neighborhoods")
             .document(neighborhoodId)
-            .collection("messages")
+            .collection("channels")
+            .document(channelId)  // Correct document for the selected channel
+            .collection("messages")  // The messages sub-collection under each channel
             .add(message)
+            .addOnSuccessListener {
+                Log.d("SendMessage", "Message sent successfully to channel $channelId")
+            }
+            .addOnFailureListener { e ->
+                Log.w("SendMessage", "Failed to send message", e)
+            }
     }
-    fun listenForMessages(neighborhoodId: String) {
+
+    private var messagesListener: ListenerRegistration? = null
+
+    private fun listenForMessages(neighborhoodId: String, channelId: String) {
+
+        messagesListener?.remove()
+
         val db = FirebaseFirestore.getInstance()
 
         db.collection("neighborhoods")
             .document(neighborhoodId)
+            .collection("channels")
+            .document(channelId)
             .collection("messages")
             .orderBy("timestamp", Query.Direction.ASCENDING)
             .addSnapshotListener { snapshots, error ->
@@ -95,17 +147,124 @@ class NeighborhoodMainActivity : AppCompatActivity() {
                 }
 
                 val messageList = mutableListOf<Message>()
-                for (doc in snapshots) {
-                    val message = doc.toObject(Message::class.java)
-                    Log.d("Firestore", "Message: ${message.text}")
+
+                for (document in snapshots) {
+                    val senderId = document.getString("senderId") ?: ""
+                    val text = document.getString("text") ?: ""
+
+                    val timestampValue = document.get("timestamp")
+                    val timestamp = when (timestampValue) {
+                        is Timestamp -> timestampValue
+                        is Long -> Timestamp(timestampValue / 1000, ((timestampValue % 1000) * 1000000).toInt())
+                        else -> null
+                    }
+
+                    val message = Message(senderId, text, timestamp)
                     messageList.add(message)
                 }
-                Log.d("Firestore", "Updating messages in adapter. Messages count: ${messageList.size}")
+
                 messagesAdapter.updateMessages(messageList)
                 messagesRecyclerView.scrollToPosition(messageList.size - 1)
             }
     }
 
 
+    private fun loadChannels(neighborhoodId: String) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("neighborhoods")
+            .document(neighborhoodId)
+            .collection("channels")
+            .get()
+            .addOnSuccessListener { result ->
+                val channelList = result.map { doc ->
+                    Channel(
+                        id = doc.id,
+                        name = doc.getString("name") ?: "Unnamed"
+                    )
+                }
+
+                if (channelList.isEmpty()) {
+                    val defaultChannelNames = listOf("Main", "General", "Tech", "Random")
+                    val defaultChannels = defaultChannelNames.map { name ->
+                        hashMapOf("name" to name)
+                    }
+
+                    val batch = db.batch()
+
+                    val channelsCollectionRef = db.collection("neighborhoods")
+                        .document(neighborhoodId)
+                        .collection("channels")
+
+                    // Add all default channels in a single batch
+                    for (channel in defaultChannels) {
+                        val newChannelRef = channelsCollectionRef.document()
+                        batch.set(newChannelRef, channel)
+                    }
+
+                    batch.commit()
+                        .addOnSuccessListener {
+                            Log.d("Firestore", "Default channels added successfully.")
+                            // Now that channels are added, load them again
+                            loadChannels(neighborhoodId)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("FirestoreError", "Error adding default channels: ", e)
+                        }
+                    return@addOnSuccessListener
+                }
+
+
+                // Continue as normal if channels exist
+                channelsAdapter = ChannelAdapter(channelList) { channel ->
+                    onChannelSelected(neighborhoodId, channel)
+                }
+                channelsRecyclerView.adapter = channelsAdapter
+                channelsAdapter.notifyDataSetChanged()
+
+                if (channelList.isNotEmpty()) {
+                    // Auto-select the first channel
+                    val firstChannel = channelList.first()
+                    selectedChannelId = firstChannel.id
+
+                    // Start listening for messages in the first channel
+                    listenForMessages(neighborhoodId, firstChannel.id)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error loading channels", e)
+            }
+    }
+
+
+    private fun onChannelSelected(neighborhoodId: String, channel: Channel) {
+        selectedChannelId = channel.id
+        Toast.makeText(this, "Selected channel: ${channel.name}", Toast.LENGTH_SHORT).show()
+
+        listenForMessages(neighborhoodId, selectedChannelId!!)
+    }
+
+    // Updated loadMessagesForChannel function for fetching messages based on the selected channel
+    private fun loadMessagesForChannel(channelId: String) {
+        val db = FirebaseFirestore.getInstance()
+        val neighborhoodId = intent.getStringExtra("neighborhoodId") ?: return
+        val channelRef = db.collection("neighborhoods")
+            .document(neighborhoodId)
+            .collection("channels")
+            .document(channelId)  // Use the correct channel ID
+
+        channelRef.collection("messages")
+            .orderBy("timestamp", Query.Direction.ASCENDING)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val messages = snapshot.toObjects(Message::class.java)
+                messagesAdapter.updateMessages(messages)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("Firestore", "Error loading messages: ", exception)
+            }
+    }
+
 }
+
 

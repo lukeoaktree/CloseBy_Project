@@ -43,17 +43,16 @@ android {
 }
 
 dependencies {
-    //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0")) // Firestore
+    // Firebase BOM
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+
+    // Firebase services
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
 
-    implementation(platform("com.google.firebase:firebase-bom:22.3.0"))
-    implementation("com.google.firebase:firebase-auth:21.0.6")  // Firebase Authentication
-    implementation("com.google.firebase:firebase-core:21.1.0") // Core for Firebase
-    implementation("com.google.firebase:firebase-analytics")
-
-    implementation ("androidx.recyclerview:recyclerview:1.2.1")
-
+    // Other libraries
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("com.android.volley:volley:1.2.1")
     implementation("com.google.android.gms:play-services-location:18.0.0")
     implementation(libs.androidx.core.ktx)

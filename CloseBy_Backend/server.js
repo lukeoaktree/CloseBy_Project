@@ -7,6 +7,9 @@ const app = express(); // initialize the app
 app.use(cors());
 app.use(bodyParser.json());
 
+const {Firestore} = require('@google-cloud/firestore');
+const firestore = new Firestore();
+
 // register user (email only, password now handled by Firebase)
 app.post("/api/register", (req, res) => {
     console.log("User Registered");
@@ -28,13 +31,11 @@ app.post("/api/register", (req, res) => {
     });
 });
 
-
 // neighborhood creation 
 app.post("/createNeighborhood", async (req, res) => {
-    
-    console.log("Neighborhood Registered"); 
-    console.log(req.body); 
-    
+    console.log("Neighborhood Registered");
+    console.log(req.body);
+
     const { name, latitude, longitude, user_id } = req.body;
 
     if (!name || !latitude || !longitude || !user_id) {
@@ -44,19 +45,19 @@ app.post("/createNeighborhood", async (req, res) => {
     const generateJoinCode = async () => {
         let joinCode;
         let exists = true;
-    
+
         while (exists) {
             joinCode = Math.random().toString(36).substring(2, 8).toUpperCase(); // generate random 6 character code
-    
+
             // check if the code already exists in the database
             const sql = "SELECT COUNT(*) AS count FROM neighborhoods WHERE join_code = ?";
             const [rows] = await db.query(sql, [joinCode]);
-    
+
             if (rows[0].count === 0) {
-                exists = false; // proceed if its unique
+                exists = false; // proceed if it's unique
             }
         }
-    
+
         return joinCode;
     };
 
@@ -71,13 +72,32 @@ app.post("/createNeighborhood", async (req, res) => {
         const sql = "INSERT INTO neighborhoods (neighborhood_id, name, location, created_by, join_code) VALUES (?, ?, ST_GeomFromText(?), ?, ?)";
         const values = [neighborhoodId, name, `POINT(${longitude} ${latitude})`, user_id, joinCode];
 
-        db.query(sql, values, (err, result) => {
+        // Insert into MySQL
+        db.query(sql, values, async (err, result) => {
             if (err) {
                 console.error("Error inserting neighborhood:", err);
                 return res.status(500).json({ error: "Database error" });
             }
-            res.json({ message: "Neighborhood added successfully!", neighborhoodId, joinCode });
+
+            // Insert into Firestore after MySQL insert
+            try {
+                const neighborhoodRef = firestore.collection('neighborhoods').doc(neighborhoodId.toString()); // Using neighborhood ID as Firestore doc ID
+                await neighborhoodRef.set({
+                    name: name,
+                    latitude: latitude,
+                    longitude: longitude,
+                    createdBy: user_id,
+                    joinCode: joinCode,
+                    createdAt: new Date(),
+                });
+
+                res.json({ message: "Neighborhood added successfully!", neighborhoodId, joinCode });
+            } catch (firestoreError) {
+                console.error("Error adding document to Firestore:", firestoreError);
+                return res.status(500).json({ error: "Error adding to Firestore" });
+            }
         });
+
     } catch (err) {
         console.error("Error:", err);
         res.status(500).json({ error: "Server error" });
@@ -114,11 +134,10 @@ app.post('/joinNeighborhood', async (req, res) => {
     }
 });
 
-
 app.post('/checkNeighborhoodCode', async (req, res) => {
     const { neighborhoodCode } = req.body;
 
-    console.log("Received join code:", neighborhoodCode); 
+    console.log("Received join code:", neighborhoodCode);
     console.log("Entire body:", req.body);
 
     if (!neighborhoodCode) {
@@ -137,7 +156,7 @@ app.post('/checkNeighborhoodCode', async (req, res) => {
 
     try {
         const [results] = await db.query(sql, [neighborhoodCode.trim().toUpperCase()]);
-        
+
         console.log("Query results:", results);
 
         if (results.length === 0) {
