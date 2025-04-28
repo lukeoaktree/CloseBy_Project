@@ -51,7 +51,6 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Send current location to the backend
             fetchLocationAndCreateNeighborhood(name)
         }
     }
@@ -73,7 +72,7 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
             return
         }
 
-        // Double check permission right before accessing location
+        // double check permission right before accessing location
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show()
             return
@@ -115,7 +114,7 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
             }
         }
 
-        // --- IMPORTANT: Permission check before requesting updates ---
+        // location permission check before requesting updates
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -128,16 +127,15 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
 
 
     private fun createNeighborhood(name: String, latitude: Double, longitude: Double, userId: String) {
-        // Check if the neighborhood already exists in Firestore
+        // check if the neighborhood already exists in Firestore
         val db = FirebaseFirestore.getInstance()
         db.collection("neighborhoods")
             .whereEqualTo("name", name)
             .get()
             .addOnSuccessListener { documents ->
                 if (documents.isEmpty) {
-                    // No duplicate, proceed with creating the neighborhood
-
-                    // Add to Firestore immediately
+                    // no duplicate proceed with creating the neighborhood
+                    // add to Firestore immediately
                     addNeighborhoodToFirestore(name, latitude, longitude, userId)
 
                     // THEN call backend
@@ -165,7 +163,6 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
                     requestQueue.add(request)
 
                 } else {
-                    // Neighborhood already exists, show an error message
                     Toast.makeText(this, "Neighborhood with this name already exists.", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -174,7 +171,6 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error checking for existing neighborhood", Toast.LENGTH_SHORT).show()
             }
     }
-
 
     private fun addNeighborhoodToFirestore(name: String, latitude: Double, longitude: Double, userId: String) {
         val db = FirebaseFirestore.getInstance()
@@ -192,7 +188,7 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
             .addOnSuccessListener { neighborhoodDocRef ->
                 Log.d("Firestore", "Neighborhood successfully added to Firestore")
 
-                // Create multiple default channels (e.g., "general", "random")
+                // create multiple default channels
                 val defaultChannels = listOf(
                     hashMapOf("name" to "Main"),
                     hashMapOf("name" to "General"),
@@ -201,21 +197,21 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
                 )
 
 
-                // Add the default channels to the neighborhood
+                // add the default channels to the neighborhood
                 for (channel in defaultChannels) {
                     neighborhoodDocRef.collection("channels")
                         .add(channel)
                         .addOnSuccessListener { channelDocRef ->
                             Log.d("Firestore", "Channel ${channel["name"]} created")
 
-                            // After creating the channel, create the default message
+                            // after creating the channel, create the default message
                             val defaultMessage = hashMapOf(
                                 "senderId" to userId,
                                 "text" to "Welcome to the ${channel["name"]} channel!",
                                 "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp()
                             )
 
-                            // Add the default message to the newly created channel's messages collection
+                            // add the default message to the newly created channel's messages collection
                             channelDocRef.collection("messages")
                                 .add(defaultMessage)
                                 .addOnSuccessListener {
@@ -237,9 +233,6 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error adding to Firestore: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
-
-
-
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
