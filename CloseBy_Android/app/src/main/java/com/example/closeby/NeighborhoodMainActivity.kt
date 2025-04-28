@@ -43,26 +43,6 @@ class NeighborhoodMainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_neighborhood_main)
 
-        // Initialize the Spinner for selecting a channel
-        val spinner: Spinner = findViewById(R.id.channelSpinner)
-        val channelNames = listOf("Main", "General", "Tech", "Random")  // Use actual channel names
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, channelNames)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
-
-        // Set up the Spinner onItemSelectedListener
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedChannel = channelNames[position]
-                // Call the function to load messages for the selected channel
-                loadMessagesForChannel(selectedChannel)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // Do nothing if no selection is made
-            }
-        }
-
         neighborhoodNameTextView = findViewById(R.id.neighborhoodName)
         messageInput = findViewById(R.id.messageInput)
         sendButton = findViewById(R.id.sendButton)
@@ -83,7 +63,7 @@ class NeighborhoodMainActivity : AppCompatActivity() {
             val messageText = messageInput.text.toString().trim()
             if (messageText.isNotEmpty()) {
                 if (selectedChannelId != null) {
-                    sendMessage(neighborhoodId, messageText)
+                    sendMessage(neighborhoodId, selectedChannelId!!, messageText)
                     messageInput.text.clear()
                 } else {
                     Toast.makeText(this, "No channel selected.", Toast.LENGTH_SHORT).show()
@@ -95,10 +75,9 @@ class NeighborhoodMainActivity : AppCompatActivity() {
 
     }
 
-    fun sendMessage(neighborhoodId: String, messageText: String) {
+    fun sendMessage(neighborhoodId: String, channelId: String, messageText: String) {
         val db = FirebaseFirestore.getInstance()
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val channelId = selectedChannelId ?: return  // Make sure this is correctly set when the channel is selected
 
         val message = hashMapOf(
             "senderId" to currentUserId,
@@ -106,20 +85,20 @@ class NeighborhoodMainActivity : AppCompatActivity() {
             "timestamp" to FieldValue.serverTimestamp()
         )
 
-        // Ensure that you are targeting the correct Firestore path for the channel
         db.collection("neighborhoods")
             .document(neighborhoodId)
             .collection("channels")
-            .document(channelId)  // Correct document for the selected channel
-            .collection("messages")  // The messages sub-collection under each channel
+            .document(channelId)
+            .collection("messages")
             .add(message)
             .addOnSuccessListener {
                 Log.d("SendMessage", "Message sent successfully to channel $channelId")
             }
             .addOnFailureListener { e ->
-                Log.w("SendMessage", "Failed to send message", e)
+                Log.e("SendMessage", "Failed to send message", e)
             }
     }
+
 
     private var messagesListener: ListenerRegistration? = null
 
@@ -214,8 +193,33 @@ class NeighborhoodMainActivity : AppCompatActivity() {
                     return@addOnSuccessListener
                 }
 
+                // update the spinner with actual channel names
+                val spinner: Spinner = findViewById(R.id.channelSpinner)
+                val adapter = ArrayAdapter(
+                    this,
+                    android.R.layout.simple_spinner_item,
+                    channelList.map { it.name }  // use actual names from Firestore
+                )
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinner.adapter = adapter
 
-                // Continue as normal if channels exist
+
+                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                        val selectedChannel = channelList[position]
+                        selectedChannelId = selectedChannel.id
+                        Toast.makeText(this@NeighborhoodMainActivity, "Selected channel: ${selectedChannel.name}", Toast.LENGTH_SHORT).show()
+
+                        // Start listening for messages in the selected channel
+                        listenForMessages(neighborhoodId, selectedChannelId!!)
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>) {
+                        // Do nothing if no selection is made
+                    }
+                }
+
+                // Set up the channel adapter for the horizontal RecyclerView (channels list)
                 channelsAdapter = ChannelAdapter(channelList) { channel ->
                     onChannelSelected(neighborhoodId, channel)
                 }
@@ -223,11 +227,8 @@ class NeighborhoodMainActivity : AppCompatActivity() {
                 channelsAdapter.notifyDataSetChanged()
 
                 if (channelList.isNotEmpty()) {
-                    // Auto-select the first channel
                     val firstChannel = channelList.first()
                     selectedChannelId = firstChannel.id
-
-                    // Start listening for messages in the first channel
                     listenForMessages(neighborhoodId, firstChannel.id)
                 }
             }
@@ -235,6 +236,7 @@ class NeighborhoodMainActivity : AppCompatActivity() {
                 Log.e("Firestore", "Error loading channels", e)
             }
     }
+
 
 
     private fun onChannelSelected(neighborhoodId: String, channel: Channel) {
