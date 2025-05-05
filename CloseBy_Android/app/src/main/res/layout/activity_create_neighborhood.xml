@@ -5,13 +5,14 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
-    android:background="#e1eaff"> <!-- Set background color -->
+    android:background="#83a5f9"> <!-- Set background color -->
 
     <EditText
         android:id="@+id/neighborhoodName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Neighborhood Name"
+        android:textColor="#ffffff"
         android:padding="12dp"
         android:textSize="16sp" />
 
@@ -20,15 +21,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Location"
+        android:textColor="#ffffff"
         android:padding="12dp"
         android:textSize="16sp"
         android:layout_marginTop="12dp" />
 
     <Button
         android:id="@+id/createNeighborhoodButton"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/roundstyle"
+        android:backgroundTint="#4471ed"
+        android:padding="12dp"
+        android:layout_width="match_parent"
         android:text="Create Neighborhood"
-        android:layout_marginTop="20dp"
-        android:padding="12dp"/>
+        android:textColor="#ffffff"
+        android:layout_marginTop="20dp" />
 </LinearLayout>

@@ -5,7 +5,7 @@
     android:padding="16dp"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="#e1eaff"> <!-- Set background color -->
+    android:background="#83a5f9"> <!-- Set background color -->
 
     <EditText
         android:id="@+id/emailEditText"
@@ -32,8 +32,13 @@
     <Button
         android:id="@+id/registerButton"
         android:layout_width="match_parent"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/roundstyle"
+        android:backgroundTint="#4471ed"
+        android:padding="12dp"
         android:layout_height="wrap_content"
         android:text="Register"
+        android:textColor="#ffffff"
         android:layout_marginTop="16dp"/>
 </LinearLayout>
 

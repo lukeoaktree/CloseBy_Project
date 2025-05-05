@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    android:background="#e1eaff"> <!-- Set background color -->
+    android:background="#83a5f9"> <!-- Set background color -->
 
     <LinearLayout
         android:id="@+id/joinForm"
@@ -23,6 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Enter Neighborhood Code"
+            android:textColor="#ffffff"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
@@ -38,9 +39,14 @@
 
         <Button
             android:id="@+id/joinButton"
-            android:layout_width="wrap_content"
+            android:layout_width="363dp"
             android:layout_height="wrap_content"
-            android:text="Join" />
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/roundstyle"
+            android:backgroundTint="#4471ed"
+            android:padding="12dp"
+            android:text="Join"
+            android:textColor="#ffffff" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

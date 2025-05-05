@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#e1eaff"> <!-- Set background color -->
+    android:background="#83a5f9"> <!-- Set background color -->
 
     <!-- CHANNELS RecyclerView (Top) -->
     <androidx.recyclerview.widget.RecyclerView
@@ -12,9 +12,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="#83a5f9"
+        android:textColor="#ffffff"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Spinner for Channel Selection (Dropdown) -->
     <Spinner
@@ -23,6 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/channelsRecyclerView"
+        android:textColor="#ffffff"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -34,9 +37,13 @@
         android:text="Neighborhood Name"
         android:textSize="24sp"
         android:layout_marginTop="8dp"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/channelSpinner"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+        
 
     <!-- MESSAGES RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
@@ -75,12 +82,18 @@
             android:id="@+id/sendButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Send"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/roundstyle"
+            android:backgroundTint="#4471ed"
+            android:padding="12dp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
+            android:text="Send"
+            android:textColor="#ffffff"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
