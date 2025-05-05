@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#e1eaff"> <!-- Set background color -->
 
     <EditText
         android:id="@+id/neighborhoodName"

@@ -4,8 +4,9 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 
 const app = express(); // initialize the app
+
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // MUST be before route definitions
 
 const {Firestore} = require('@google-cloud/firestore');
 const firestore = new Firestore();
@@ -34,6 +35,7 @@ app.post("/api/register", (req, res) => {
 // neighborhood creation 
 // neighborhood creation
 app.post("/createNeighborhood", async (req, res) => {
+    console.log("REQ.BODY = ", req.body);
     console.log("Neighborhood Registered");
     console.log(req.body);
 
@@ -48,7 +50,7 @@ app.post("/createNeighborhood", async (req, res) => {
         let exists = true;
 
         while (exists) {
-            joinCode = Math.random().toString(36).substring(2, 8).toUpperCase(); // generate random 6 character code
+            joinCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             const sql = "SELECT COUNT(*) AS count FROM neighborhoods WHERE join_code = ?";
             const [rows] = await db.query(sql, [joinCode]);
 
@@ -65,7 +67,6 @@ app.post("/createNeighborhood", async (req, res) => {
     };
 
     try {
-        // ✅ FIRST: Check if the neighborhood name already exists
         const checkSql = "SELECT COUNT(*) AS count FROM neighborhoods WHERE name = ?";
         const [checkRows] = await db.query(checkSql, [name]);
 
@@ -73,17 +74,24 @@ app.post("/createNeighborhood", async (req, res) => {
             return res.status(400).json({ message: "Neighborhood with this name already exists." });
         }
 
-        // ✅ If no duplicate, proceed with creation
         const neighborhoodId = generateNeighborhoodId();
         const joinCode = await generateJoinCode();
 
+        // ✅ Send response immediately with joinCode
+        res.status(200).json({
+            message: "Neighborhood creation in progress.",
+            joinCode,
+            neighborhoodId
+        });
+
+        // 🔄 Do database work after response
         const insertSql = "INSERT INTO neighborhoods (neighborhood_id, name, location, created_by, join_code) VALUES (?, ?, ST_GeomFromText(?), ?, ?)";
         const values = [neighborhoodId, name, `POINT(${longitude} ${latitude})`, user_id, joinCode];
 
         db.query(insertSql, values, async (err, result) => {
             if (err) {
-                console.error("Error inserting neighborhood:", err);
-                return res.status(500).json({ error: "Database error" });
+                console.error("Full DB Insert Error:", JSON.stringify(err, null, 2));
+                return;
             }
 
             try {
@@ -97,18 +105,21 @@ app.post("/createNeighborhood", async (req, res) => {
                     createdAt: new Date(),
                 });
 
-                res.json({ message: "Neighborhood added successfully!", neighborhoodId, joinCode });
+                console.log("Neighborhood created successfully in MySQL and Firestore.");
             } catch (firestoreError) {
-                console.error("Error adding document to Firestore:", firestoreError);
-                return res.status(500).json({ error: "Error adding to Firestore" });
+                console.error("Firestore Error:", firestoreError);
             }
         });
 
     } catch (err) {
         console.error("Error:", err);
-        res.status(500).json({ error: "Server error" });
+        if (!res.headersSent) {
+            res.status(500).json({ error: "Server error" });
+        }
     }
 });
+
+
 
 
 app.post('/joinNeighborhood', async (req, res) => {

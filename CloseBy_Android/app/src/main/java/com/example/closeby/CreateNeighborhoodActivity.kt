@@ -175,11 +175,19 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
             put("longitude", longitude)
             put("user_id", userId)
         }
+        Log.d("CreateNeighborhoodPayload", jsonObject.toString())
 
         val request = JsonObjectRequest(
             Request.Method.POST, url, jsonObject,
             { response ->
                 Log.d("CreateNeighborhood", "Backend creation success")
+
+                // Extract the join code from the response
+                val joinCode = response.optString("joinCode")
+                if (joinCode.isNotEmpty()) {
+                    copyToClipboard(joinCode) // Copy the join code to the clipboard
+                }
+
                 // Backend successful -> Now add to Firestore
                 addNeighborhoodToFirestore(name, latitude, longitude, userId)
             },
@@ -193,6 +201,16 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
 
         requestQueue.add(request)
     }
+
+    // Function to copy the join code to the clipboard
+    private fun copyToClipboard(joinCode: String) {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        val clip = android.content.ClipData.newPlainText("Join Code", joinCode)
+        clipboard.setPrimaryClip(clip)
+
+        Toast.makeText(this, "Join code copied to clipboard!", Toast.LENGTH_SHORT).show()
+    }
+
 
     private fun addNeighborhoodToFirestore(name: String, latitude: Double, longitude: Double, userId: String) {
         val db = FirebaseFirestore.getInstance()
@@ -212,8 +230,8 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
                 val defaultChannels = listOf(
                     hashMapOf("name" to "Main"),
                     hashMapOf("name" to "General"),
-                    hashMapOf("name" to "Tech"),
-                    hashMapOf("name" to "Random")
+                    hashMapOf("name" to "Dog Walking"),
+                    hashMapOf("name" to "Events")
                 )
 
                 for (channel in defaultChannels) {
@@ -233,6 +251,7 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
 
                 Toast.makeText(this, "Neighborhood and channels created!", Toast.LENGTH_SHORT).show()
 
+
                 // Navigate to NeighborhoodActivity
                 val intent = Intent(this, NeighborhoodActivity::class.java)
                 intent.putExtra("neighborhood_name", name)
@@ -248,17 +267,5 @@ class CreateNeighborhoodActivity : AppCompatActivity() {
             }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                val name = nameInput.text.toString().trim()
-                fetchLocationAndCreateNeighborhood(name)
-            } else {
-                Toast.makeText(this, "Location permission is required", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
-}
 

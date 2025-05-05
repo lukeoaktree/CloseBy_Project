@@ -4,18 +4,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#e1eaff"> <!-- Set background color -->
 
     <Button
         android:id="@+id/joinButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Join Neighborhood"
+        android:textColor="#ffffff" 
+        android:background="@drawable/button_background" 
         android:layout_marginBottom="16dp" />
 
     <Button
         android:id="@+id/createButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Neighborhood" />
+        android:text="Create Neighborhood"
+        android:textColor="#ffffff"
+        android:background="@drawable/button_background" 
+        android:layout_marginBottom="16dp" />
 </LinearLayout>

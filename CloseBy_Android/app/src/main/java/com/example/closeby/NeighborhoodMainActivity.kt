@@ -68,9 +68,21 @@ class NeighborhoodMainActivity : AppCompatActivity() {
         }
     }
 
-    fun sendMessage(neighborhoodId: String, channelId: String, messageText: String) {
+    private fun sendMessage(neighborhoodId: String, channelId: String, messageText: String) {
         val db = FirebaseFirestore.getInstance()
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (currentUserId == null) {
+            Log.e("SendMessage", "User is not logged in")
+            return
+        }
+
+        if (messageText.isBlank()) {
+            Log.e("SendMessage", "Message text is empty")
+            return
+        }
+
+        Log.d("SendMessage", "Sending message to: neighborhoods/$neighborhoodId/channels/$channelId/messages")
 
         val message = hashMapOf(
             "senderId" to currentUserId,
@@ -85,12 +97,13 @@ class NeighborhoodMainActivity : AppCompatActivity() {
             .collection("messages")
             .add(message)
             .addOnSuccessListener {
-                Log.d("SendMessage", "message sent successfully to channel $channelId")
+                Log.d("SendMessage", "Message sent successfully to channel $channelId")
             }
             .addOnFailureListener { e ->
-                Log.e("SendMessage", "failed to send message", e)
+                Log.e("SendMessage", "Failed to send message", e)
             }
     }
+
 
     private var messagesListener: ListenerRegistration? = null
 
@@ -154,7 +167,7 @@ class NeighborhoodMainActivity : AppCompatActivity() {
                 }
 
                 if (channelList.isEmpty()) {
-                    val defaultChannelNames = listOf("Main", "General", "Tech", "Random")
+                    val defaultChannelNames = listOf("Main", "General", "Events", "Dog Walking")
                     val defaultChannels = defaultChannelNames.map { name ->
                         hashMapOf("name" to name)
                     }

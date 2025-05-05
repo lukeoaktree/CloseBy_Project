@@ -8,14 +8,13 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.closeby.CreateNeighborhoodActivity
+import com.example.closeby.JoinNeighborhoodActivity
 import com.example.closeby.LoginActivity
-import com.example.closeby.R
 import com.google.firebase.auth.FirebaseAuth
 
 class NeighborhoodActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_neighborhood)
 
@@ -25,8 +24,7 @@ class NeighborhoodActivity : AppCompatActivity() {
         // check if buttons are being clicked
         joinButton.setOnClickListener {
             val intent = Intent(this, JoinNeighborhoodActivity::class.java)
-            startActivity(Intent(this, JoinNeighborhoodActivity::class.java))
-
+            startActivity(intent)
         }
 
         createButton.setOnClickListener {
@@ -34,10 +32,12 @@ class NeighborhoodActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_logout -> {
@@ -50,6 +50,4 @@ class NeighborhoodActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-
 }
