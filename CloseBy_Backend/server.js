@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const app = express(); // initialize the app
 
 app.use(cors());
-app.use(bodyParser.json()); // MUST be before route definitions
+app.use(bodyParser.json()); 
 
 const {Firestore} = require('@google-cloud/firestore');
 const firestore = new Firestore();
@@ -139,7 +139,6 @@ app.post('/joinNeighborhood', async (req, res) => {
             return res.status(404).json({ message: "Neighborhood not found" });
         }
 
-        // Proceed with inserting the user into the neighborhood
         await db.query(
             'INSERT INTO neighborhood_members (user_id, neighborhood_id) VALUES (?, ?)',
             [userId, neighborhood[0].neighborhood_id]
@@ -147,7 +146,7 @@ app.post('/joinNeighborhood', async (req, res) => {
 
         res.json({ message: 'Joined neighborhood successfully' });
     } catch (error) {
-        console.error("Error:", error);  // Log the error for server-side debugging
+        console.error("Error:", error);  
         res.status(500).json({ message: "Internal server error" });
     }
 });
