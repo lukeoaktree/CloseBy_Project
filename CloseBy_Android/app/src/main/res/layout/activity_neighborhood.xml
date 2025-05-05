@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
     android:background="#83a5f9"> <!-- Set background color -->
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/closebylogo" />
 
     <Button
         android:id="@+id/joinButton"
@@ -28,4 +34,6 @@
         android:backgroundTint="#4471ed"
         android:text="Create Neighborhood"
         android:textColor="#ffffff" />
+
+
 </LinearLayout>

@@ -77,14 +77,14 @@ app.post("/createNeighborhood", async (req, res) => {
         const neighborhoodId = generateNeighborhoodId();
         const joinCode = await generateJoinCode();
 
-        // ✅ Send response immediately with joinCode
+        // Send response immediately with joinCode
         res.status(200).json({
             message: "Neighborhood creation in progress.",
             joinCode,
             neighborhoodId
         });
 
-        // 🔄 Do database work after response
+        // Do database work after response
         const insertSql = "INSERT INTO neighborhoods (neighborhood_id, name, location, created_by, join_code) VALUES (?, ?, ST_GeomFromText(?), ?, ?)";
         const values = [neighborhoodId, name, `POINT(${longitude} ${latitude})`, user_id, joinCode];
 
