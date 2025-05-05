@@ -8,6 +8,18 @@
     android:padding="24dp"
     android:background="#83a5f9"> <!-- Set background color -->
 
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="309dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="76dp"
+        android:contentDescription="App Logo"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/closebylogo" />
+
     <LinearLayout
         android:id="@+id/joinForm"
         android:orientation="vertical"
@@ -51,11 +63,5 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/imageView7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/closebylogo"
-        tools:layout_editor_absoluteX="32dp"
-        tools:layout_editor_absoluteY="94dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

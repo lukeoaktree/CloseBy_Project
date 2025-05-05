@@ -27,7 +27,7 @@ class NeighborhoodMainActivity : AppCompatActivity() {
     private lateinit var sendButton: Button
     private lateinit var messagesRecyclerView: RecyclerView
     private lateinit var channelsRecyclerView: RecyclerView
-    private lateinit var channelsAdapter: ChannelAdapter
+   // private lateinit var channelsAdapter: ChannelAdapter
     private var selectedChannelId: String? = null
     private lateinit var messagesAdapter: MessageAdapter
 
@@ -216,11 +216,11 @@ class NeighborhoodMainActivity : AppCompatActivity() {
                     }
                 }
 
-                channelsAdapter = ChannelAdapter(channelList) { channel ->
-                    onChannelSelected(neighborhoodId, channel)
-                }
-                channelsRecyclerView.adapter = channelsAdapter
-                channelsAdapter.notifyDataSetChanged()
+//                channelsAdapter = ChannelAdapter(channelList) { channel ->
+//                    onChannelSelected(neighborhoodId, channel)
+//                }
+//                channelsRecyclerView.adapter = channelsAdapter
+//                channelsAdapter.notifyDataSetChanged()
 
                 if (channelList.isNotEmpty()) {
                     val firstChannel = channelList.first()
