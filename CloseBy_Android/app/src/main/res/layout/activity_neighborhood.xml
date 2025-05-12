@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
-    android:background="#83a5f9"> <!-- Set background color -->
+    android:background="#83a5f9"> 
     <ImageView
         android:id="@+id/imageView4"
         android:layout_width="match_parent"

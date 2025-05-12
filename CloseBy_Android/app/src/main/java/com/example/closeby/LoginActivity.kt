@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Proceed to the next activity
+
                     val user = auth.currentUser
                     if (user != null) {
 
@@ -50,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
                         finish()
                     }
                 } else {
-                    // Handle different error scenarios
+                    // Handle different err
                     val errorCode = (task.exception as FirebaseAuthException).errorCode
                     when (errorCode) {
                         "ERROR_INVALID_EMAIL" -> {

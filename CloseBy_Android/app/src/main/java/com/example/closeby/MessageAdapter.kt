@@ -17,7 +17,6 @@ class MessageAdapter(private var messages: MutableList<Message>) :
         notifyDataSetChanged()
     }
 
-    // Generate a light color based on a unique user string (email or UID)
     fun generateLightColorFromString(input: String): Int {
         val hash = input.hashCode()
         val r = (hash shr 16 and 0xFF) % 128 + 127

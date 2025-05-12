@@ -73,7 +73,7 @@ class RegisterActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Firebase registration success, now send the email to your backend
+
                     sendEmailToServer(email)
                     Toast.makeText(this, "User registered successfully!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, NeighborhoodActivity::class.java)

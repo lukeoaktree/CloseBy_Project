@@ -18,9 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Spinner for Channel Selection (Dropdown) -->
-
-    <!-- Neighborhood Name TextView -->
+    
     <Spinner
         android:id="@+id/channelSpinner"
         android:layout_width="0dp"
@@ -47,7 +45,6 @@
 
         
 
-    <!-- MESSAGES RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messagesRecyclerView"
         android:layout_width="0dp"
@@ -58,7 +55,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/messageBar" />
 
-    <!-- Message Bar (Input and Send Button) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/messageBar"
         android:layout_width="0dp"
